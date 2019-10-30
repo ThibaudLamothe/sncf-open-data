@@ -1,0 +1,101 @@
+body {
+    background-color: #1E1E1E;
+    color: #d8d8d8;
+    margin: 0;
+    padding: 0;
+    
+  }
+
+.content
+{
+    display: flex;
+    background-color: purple;
+    justify-content: space-between;
+    max-height: 100%;
+
+    
+        
+}
+
+nav {
+    margin:50px;
+    max-width: 300px;
+    background-color: red;
+    margin:15px;
+}
+
+section
+{
+    display: flex;
+    flex-direction: column;
+    background-color: royalblue;
+    /* width:100%; */
+    margin: 15px;
+    flex:1;
+    align-items: center;
+    max-height: 100%;
+}
+
+
+.upperKPI
+{
+    display: flex;
+    flex-direction: column;
+    background-color: green;
+    width:95%;
+    margin: auto;
+    
+}
+
+.KPIs
+{
+    display: flex;
+    justify-content: space-around;
+    background-color: greenyellow;
+    /* width:100%; */
+}
+
+.TimeSelector{
+    display: flex;
+    flex-direction: column;
+    margin:auto;
+    width:100%;
+    text-align:center;
+}
+#id-year{
+    /* width:80%;
+    margin:auto; */
+    background-color: brown;
+}
+
+
+.graphiques{
+    display: flex;
+    background-color: orange;
+    width:95%;
+    margin:auto;
+    max-height: 750px;
+}
+
+
+
+.leftGraph{
+    display: flex;
+    flex-direction: column;
+    background-color: magenta;
+    width : 50%;
+    padding:10px;
+    max-height: 100%;
+    overflow:auto;
+}
+
+.rightMap{
+    display: flex;
+    flex-direction: column;
+    background-color: orangered;
+    width:50%;
+    padding :10px;
+}
+
+
+
