@@ -2,48 +2,47 @@ body {
     background-color: #1E1E1E;
     color: #d8d8d8;
     margin: 0;
-    padding: 0;
-    
+    padding: 0; 
   }
 
 .content
 {
     display: flex;
-    background-color: purple;
+    /* background-color: purple; */
     justify-content: space-between;
-    max-height: 100%;
-
-    
-        
 }
 
 nav {
     margin:50px;
-    max-width: 300px;
-    background-color: red;
+    min-width: 300px;
+    max-width: 100%;
+    /* background-color: red; */
     margin:15px;
+    max-height:100%;
 }
 
 section
 {
     display: flex;
     flex-direction: column;
-    background-color: royalblue;
-    /* width:100%; */
+    /* background-color: royalblue; */
+    max-width: 80%;
     margin: 15px;
     flex:1;
     align-items: center;
-    max-height: 100%;
+    height:800px;
 }
 
+/* SECTION : KPI */
 
 .upperKPI
 {
     display: flex;
     flex-direction: column;
-    background-color: green;
+    /* background-color: green; */
     width:95%;
-    margin: auto;
+    margin: 5px;
+    height:20%;
     
 }
 
@@ -51,51 +50,73 @@ section
 {
     display: flex;
     justify-content: space-around;
-    background-color: greenyellow;
-    /* width:100%; */
+    /* background-color: greenyellow; */
+    margin:10px;
+    height: 75%;
 }
 
 .TimeSelector{
     display: flex;
     flex-direction: column;
     margin:auto;
-    width:100%;
+    width:90%;
+    height:25%;
     text-align:center;
-}
-#id-year{
-    /* width:80%;
-    margin:auto; */
-    background-color: brown;
+    /* background-color: rgb(131, 214, 7); */
 }
 
+/* SECTION : GRAPHIQUES */
 
 .graphiques{
     display: flex;
-    background-color: orange;
-    width:95%;
     margin:auto;
-    max-height: 750px;
+    /* background-color: orange; */
+    width:95%;
+    height:80%;
 }
-
 
 
 .leftGraph{
     display: flex;
-    flex-direction: column;
-    background-color: magenta;
-    width : 50%;
-    padding:10px;
-    max-height: 100%;
     overflow:auto;
+    flex-direction: column;
+    justify-content: center;
+    margin:10px;
+    /* background-color: magenta; */
+    width : 50%;
+    height: 95%;
+    
 }
+ 
+#distribution-retard{
+    margin:auto;
+    width:90%;
+    height:40%;
+}
+ 
+#cause-retard{
+    margin:auto;
+    width:90%;
+    height:40%;
+} 
 
 .rightMap{
     display: flex;
+    overflow:auto;
     flex-direction: column;
-    background-color: orangered;
+    justify-content: center;
+    margin:10px;
+    /* background-color: orangered; */
+
     width:50%;
-    padding :10px;
+    height:95%;
 }
 
+
+#map-graph{
+    margin:auto;
+    height:95%;
+    width:95%;
+}
 
 

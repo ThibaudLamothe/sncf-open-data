@@ -4,8 +4,8 @@ import pandas as pd
 
 class SNCF:
 
-    def __init__(self):
-        self.api_key = self.__get_api_key('sncf.token')
+    def __init__(self, token_path='sncf.token'):
+        self.api_key = self.__get_api_key(token_path)
         self.api_endpoint = 'https://ressources.data.sncf.com/api/records/1.0/search/'
 
 

@@ -1,4 +1,5 @@
 import dash
+import dash_daq as daq
 import dash_core_components as dcc
 import dash_html_components as html
 import pandas as pd
@@ -22,15 +23,19 @@ app = dash.Dash(
 # Creating server
 server = app.server
 
+mapbox_access_token = f.get_token('../../dash.token')
+
+
+        
+
 ############################################################################################
 ######################################### DATA PREP ########################################
 ############################################################################################
 
 # Loading necessary data
 df = f.load_pickle('dash_first_try.p')
-print(df.head())
-
 gares = df.pipe(f.get_gares)
+print(df.head())
 
 min_date = 2014 #df['periode'].min()
 max_date = 2019 #df['periode'].max()
@@ -65,6 +70,7 @@ app.layout = html.Div(
                 html.Img(
                     className="logo",
                     src="https://upload.wikimedia.org/wikipedia/fr/f/f7/Logo_SNCF_%282005%29.svg",
+                    # src="./tgv_late/app/img/logo_SNCF.svg",
                     width=200,
                 ),
                 html.H2("OPEN DATA"),
@@ -72,6 +78,20 @@ app.layout = html.Div(
                     """Analyse des retards des TGVs entre 2016 et 2019.
                     """
                 ),
+
+                html.Div(
+                    [
+                        daq.ToggleSwitch(
+                            id='my-toggle-switch',
+                            vertical=True,
+                            value=True,
+                            size=25,
+                            label='Toutes les gares',
+                        ),
+                        html.Div(id='toggle-switch-output')
+                    ]
+                ),
+                html.Br(),
                 html.Div(
                     children=[
                         html.Div(
@@ -79,12 +99,13 @@ app.layout = html.Div(
                             children=[
                                 # Dropdown for locations on map
                                 dcc.Dropdown(
-                                    id="location-dropdown-1",
+                                    id="gare-depart",
                                     options=[
                                         {"label": i, "value": i}
-                                        for i in gares #list_of_locations
+                                        for i in gares
                                     ],
                                     placeholder="Gare de départ",
+                                    value='BORDEAUX ST JEAN'
                                 )
                             ],
                         ),
@@ -98,17 +119,19 @@ app.layout = html.Div(
                             children=[
                                 # Dropdown for locations on map
                                 dcc.Dropdown(
-                                    id="location-dropdown-2",
+                                    id="gare-arrivee",
                                     options=[
                                         {"label": i, "value": i}
                                         for i in gares 
                                     ],
-                                    placeholder="Gare d'arrivée'",
+                                    placeholder="Gare d'arrivée",
+                                    value='PARIS MONTPARNASSE',
                                 )
                             ],
                         ),
                     ],
                 ),
+
 
                 dcc.Markdown(
                     children=[
@@ -142,9 +165,9 @@ app.layout = html.Div(
                         html.Div(
                             className='TimeSelector',
                             children=[
-                                html.P('Time Selector'),
+                                # html.P('Time Selector'),
                                 dcc.RangeSlider(
-                                    id='id-year',
+                                    id='time-filter',
                                     min=min_date,
                                     max=max_date,
                                     step=1,
@@ -163,40 +186,42 @@ app.layout = html.Div(
                         html.Article(
                             className='leftGraph',
                             children=[
-                                html.Div(
-                                    className="text-padding",
-                                    children=[
-                                        "Place for KPIS."
+                                dcc.RadioItems(
+                                    id='choix-distribution-retard',
+                                    options=[
+                                        {'label': 'Nombre de trains', 'value': 'train'},
+                                        {'label': 'Nombre de minutes', 'value': 'minute'},
                                     ],
+                                    value='train',
                                 ),
-                                html.Div(
-                                    children=[
-                                        dcc.Graph(id='distribution-retard')
+                                dcc.RadioItems(
+                                    id='couleur-distribution-retard',
+                                    options=[
+                                        {'label': 'Par année', 'value': 'an'},
+                                        {'label': 'Par gare d\'arrivée', 'value': 'gare'},
                                     ],
-                                    style={'margin-top': '10'},
-                                ),                               
-                                html.Div(
-                                    className="text-padding",
-                                    children=[
-                                        "Select any of the bars on the histogram to section data by time."
-                                    ],
+                                    value='an',
                                 ),
-                                dcc.Graph(id="cause-retard"),
+                                dcc.Graph(id="distribution-retard"),
+                                html.P("Select any of the bars on the histogram to section data by time."),
+                                dcc.Graph(id='cause-retard'),
+                                
                             ],
                         ),
                         html.Article(
                             className='rightMap',
                             children=[
-                                html.Div("Ci-dessous la map"),
-                                dcc.Graph(id="map-graph"),
-                                html.Div(
-                                    id="map-description",
-                                    children=[
-                                        "La liste des commentaires apparaitra ici", html.Br(),
-                                        "Select any of the bars on the histogram to section data by time."
-                                    ]
-                                ),
-                            ],
+                                dcc.Graph(id='map-graph', config={ "scrollZoom": True}),
+                                # html.Div(
+                                #     id="map-description",
+                                #     children=[
+                                #         "La liste des commentaires apparaitra ici", html.Br(),
+                                #         "Select any of the bars on the histogram to section data by time.",
+                                #         dcc.Graph(id='individual_graph')
+
+                                #     ]
+                                # )
+                            ]
                         )
                     ]
                 )
@@ -206,49 +231,36 @@ app.layout = html.Div(
 )
 
 ############################################################################################
-######################################### CALLBACKS ########################################
+#########################################  FONCTIONS #######################################
 ############################################################################################
 
 
-@app.callback(
-    Output('distribution-retard', 'figure'),
-    [Input(component_id='location-dropdown-1', component_property='value')]
-    )
-def distribution_retard(input_, dff=df):
-    data=[
-        go.Scatter(
-            x=[1, 2, 3, 4],
-            y=[10, 11, 12, 13],
-            mode='markers',
-            marker=dict(
-                size=[40, 60, 80, 100],
-                color=[0, 1, 2, 3]
-            )
-        )
-    ]
-    return {"data": data} #, "layout": layout}
+def filter_df(df, depart=None, arrivee=None, time_filter=None):
+    dff = df.copy()
+    start, end = None, None
+   
+    print('> FILTERING', dff.shape)
+    print('-', depart, arrivee, start, end)
+    if time_filter:
+        print(time_filter)
+        start = pd.to_datetime(str(time_filter[0]))
+        end = pd.to_datetime(str(time_filter[1]))
 
-
-
-
-@app.callback(
-    Output('cause-retard', 'figure'),
-    [Input(component_id='location-dropdown-1', component_property='value')]
-    )
-def casue_retard(input_, dff=df):
-    
-    colors = ['lightslategray',] * 5
-    colors[1] = 'crimson'
-
-    data=[go.Bar(
-        x=['Feature A', 'Feature B', 'Feature C',
-        'Feature D', 'Feature E'],
-        y=[20, 14, 23, 25, 22],
-        marker_color=colors # marker color can be a single color value or an iterable
-    )]
-    
-    return {"data": data} #, "layout": layout}
-
+    print(start, end)
+    if depart:
+        dff = dff[dff['gare_depart']==depart]
+        print('depart', dff.shape)
+    if arrivee:
+        dff = dff[dff['gare_arrivee']==arrivee]
+        print('arrivee', dff.shape)
+    if start:
+        print('start', dff.shape)
+        dff = dff[dff['periode']>=start]
+    if end:
+        print('end', dff.shape)
+        dff = dff[dff['periode']<=end]
+    print('final', dff.shape)
+    return dff
 
 def circle_number(value):
     values = [100-value,value]
@@ -284,57 +296,202 @@ def circle_number(value):
     return {"data": data, "layout": layout}
 
 
-@app.callback(Output('map-graph', 'figure'),[Input(component_id='location-dropdown-1', component_property='value')])
-def map_graph(input_, dff=df):
+############################################################################################
+######################################### CALLBACKS ########################################
+############################################################################################
 
-    return circle_number(random.randint(1,99))
+input_list =[
+    Input(component_id='gare-depart', component_property='value'),
+    Input(component_id='gare-arrivee', component_property='value'),
+    Input(component_id='time-filter', component_property='value')
+]
 
-@app.callback(Output('kpi-1', 'figure'),[Input(component_id='location-dropdown-1', component_property='value')])
+
+@app.callback([Output('gare-arrivee', 'options'),Output('gare-arrivee', 'value')],
+    [Input(component_id='gare-depart', component_property='value')])
+def reselect_arrivee(depart, dff=df):
+    print('> Arrival selection (from {})'.format(depart))
+    gare_arrivee = df.pipe(f.get_gare_complement, depart)
+    return [{"label": i, "value": i} for i in gare_arrivee], gare_arrivee[0]
+
+
+##############################
+# GRAPHIQUES
+##############################
+@app.callback(Output('distribution-retard', 'figure'),
+    input_list + [
+        Input(component_id='choix-distribution-retard', component_property='value'),
+        Input(component_id='couleur-distribution-retard', component_property='value')])
+def distribution_retard(depart, arrivee, time_filter, choix_radio, couleur, dff=df):
+    print('> Graphique 1 : Distribution Retard')
+    dff = df.pipe(filter_df, depart, arrivee, time_filter)
+    
+    # Select axes
+    x = dff['nbr_trains_retard_depart'].tolist()
+    if choix_radio=='train':
+        y = dff['nbr_trains_retard_arrivee'].tolist()
+    else: # choix==minute
+        y = dff['retard_moyen_trains_retard_arrivee__min'].tolist()
+    
+    # Select color_scheme
+    if couleur=='an':
+        colors = dff.pipe(f.transform_category_to_color, 'annee').tolist()
+    else: # couleur==gare
+        colors = dff.pipe(f.transform_category_to_color, 'gare_arrivee').tolist()
+
+    data=[
+        go.Scatter(
+            x=x,
+            y=y,
+            mode='markers',
+            marker=dict(color=colors,)#     size=[40, 60, 80, 100],
+        )
+    ]
+    
+    margin=40
+    layout=go.Layout(
+        margin={'l': margin,'b': margin,'t': margin,'r': margin}
+    )
+    return {"data": data, "layout": layout}
+
+
+@app.callback(Output('cause-retard', 'figure'),input_list)
+def cause_retard(depart, arrivee, time_filter, dff=df):
+    print('> Graphique 2 : Cause Retard')
+    cause_retard = (df
+        .pipe(filter_df, depart, arrivee, time_filter)
+        .pipe(f.get_root_cause)
+    )
+    
+    causes = list(cause_retard.keys())
+    values = list(cause_retard.values())
+
+    colors = ['lightslategray',] * len(causes)
+    max_index = values.index(max(values))
+    colors[max_index] = 'crimson'
+
+    data=[go.Bar(
+        x= causes,
+        y= values,
+        marker_color=colors 
+    )]
+
+    margin=20
+    layout=go.Layout(
+        margin={'l': margin,'b': margin,'t': margin,'r': margin}
+    )
+    return {"data": data, "layout": layout}
+
+
+
+##############################
+# KPIS
+##############################
+
+
+
+@app.callback(Output('kpi-1', 'figure'),[Input(component_id='time-filter', component_property='value')])
 def kpi_1(input_, dff=df):
+    print('> KPI 1')   
     return circle_number(random.randint(1,99))
 
-@app.callback(Output('kpi-2', 'figure'),[Input(component_id='location-dropdown-1', component_property='value')])
+@app.callback(Output('kpi-2', 'figure'),[Input(component_id='gare-depart', component_property='value')])
 def kpi_2(input_, dff=df):
+    print('> KPI 2')
     return circle_number(random.randint(1,99))
 
-@app.callback(Output('kpi-3', 'figure'),[Input(component_id='location-dropdown-1', component_property='value')])
-def kpi_3(input_, dff=df):
-    return circle_number(random.randint(1,99))
+@app.callback(Output('kpi-3', 'figure'), input_list)
+def kpi_3(depart, arrivee,time_filter, dff=df):
+    print('> KPI 3')
+    print(time_filter)
+    dff = df.pipe(filter_df, depart, arrivee, time_filter)
+    nombre_retard = dff['nbr_trains_retard_arrivee'].sum()
+    circle = circle_number(nombre_retard)
+    return circle
 
-@app.callback(Output('kpi-4', 'figure'),[Input(component_id='location-dropdown-1', component_property='value')])
+@app.callback(Output('kpi-4', 'figure'),[Input(component_id='gare-depart', component_property='value')])
 def kpi_4(input_, dff=df):
     return circle_number(random.randint(1,99))
 
-@app.callback(Output('kpi-5', 'figure'),[Input(component_id='location-dropdown-1', component_property='value')])
+@app.callback(Output('kpi-5', 'figure'),[Input(component_id='gare-arrivee', component_property='value')])
 def kpi_5(input_, dff=df):
     return circle_number(random.randint(1,99))
 
-# # GRAPH 2 : DISPO A DATE
-# @app.callback(
-#     Output('dispo_a_date', 'figure'),
-#     [Input('picker_single', 'date')] + values.input_)
-# def dispo_date_(date, model, origin, finition, geography, df_m=rep['df_maintenance_small'], df_car=rep['df_caracteristique_total']):
-    # result = {}
-    # for mod in model:
-    #     dff = filter_and_compute.filterVehicle(df_car, [mod], origin, finition, dept=geography)
-    #     mr = filter_and_compute.getPctDispoADate(df_m, dff, d=str(date))
-    #     result[mod] = mr['pct_dispo']
-    
-    # data = [go.Bar(y=[mod for mod in result.values()],
-    #                x=[mod for mod in result.keys()],
-    #                text=[mod for mod in result.values()],
-    #                textposition = 'auto')]
 
-    # layout = go.Layout(
-    #     barmode="stack",
-    #     margin=dict(l=35, r=25, b=30, t=30, pad=10),
-    #     paper_bgcolor="white",
-    #     plot_bgcolor="white",
-    #     title="Taux de disponibilité à date"
-    # )
+##############################
+# MAP
+##############################
 
-    # return {"data": data, "layout": layout}
 
+
+layout_map = dict(
+    # autosize=True,
+    # height=750,
+    font=dict(color='#7FDBFF'),
+    titlefont=dict(color='#7FDBFF', size='22'),
+    margin=dict(
+        l=35,
+        r=35,
+        b=35,
+        t=45
+    ),
+    hovermode="closest",
+    plot_bgcolor="#191A1A",
+    paper_bgcolor="#020202",
+    showlegend=True,
+    legend=dict(font=dict(size=20), orientation='h'),
+    title="Vue cartographique",
+    mapbox=dict(
+        accesstoken=mapbox_access_token,
+        style="dark",
+        center=dict(
+            lon=2.333333,
+            lat=48.866667
+        ),
+        zoom=6,
+    )
+)
+
+
+@app.callback(Output('map-graph', 'figure'),
+                input_list
+            #   [Input("affichage", "values"),
+            #    Input("origine_dropdown", "value")],
+            #   [State('main_graph', 'relayoutData')]
+              )
+# def make_main_figure(affichage,origine, main_graph_layout, df_car=rep_new['vehicules_actifs'], df_ateliers=rep_new['ateliers']):
+def make_main_figure(debut, fin, time_, dff=df):
+    gare_position = f.load_pickle('gare_gps.p')
+    df_gare = pd.DataFrame(
+        {
+            'gare':[key for key in gare_position.keys()],
+            'latitude':[value['latitude'] for value in gare_position.values()],
+            'longitude':[value['longitude'] for value in gare_position.values()],
+            'adresse':[value['location_adress'] for value in gare_position.values()]
+        }
+    ).set_index('gare')
+    print(df_gare.head())
+
+    lat_atelier = df_gare['latitude'].to_list()
+    lon_atelier =  df_gare['longitude'].to_list()
+    noms_ateliers = df_gare['adresse'].to_list()
+
+    trace = dict(
+        type='scattermapbox',
+        lon=lon_atelier,
+        lat=lat_atelier,
+        text=noms_ateliers,
+        name = "Gares",
+        # customdata=customdata,
+        marker=dict(
+            size=15,
+            color='#BFD3E6',
+            opacity=0.7
+        )
+    )
+
+    figure = dict(data=[trace], layout=layout_map)
+    return figure
 
 
 ############################################################################################
