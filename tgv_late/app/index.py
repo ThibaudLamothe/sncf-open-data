@@ -52,6 +52,23 @@ def min_max_date(df):
     return min_date, max_date
 
 
+def NamedDropdown(name, **kwargs):
+    return html.Div(
+        style={"margin": "10px 0px"},
+        children=[
+            html.P(children=f"{name}:", style={"margin-left": "3px"}),
+            dcc.Dropdown(**kwargs),
+        ],
+    )
+
+def simpleButton(name, **kwargs):
+    return html.Div(
+        style={"margin": "10px 0px"},
+        children=[
+            daq.PowerButton(**kwargs)
+        ],
+    )
+
 
 ############################################################################################
 ######################################### MAIN APP #########################################
@@ -71,6 +88,7 @@ app.layout = html.Div(
                     className="logo",
                     src="https://upload.wikimedia.org/wikipedia/fr/f/f7/Logo_SNCF_%282005%29.svg",
                     # src="./tgv_late/app/img/logo_SNCF.svg",
+                    # src="./img/logo_SNCF.svg",
                     width=200,
                 ),
                 html.H2("OPEN DATA"),
@@ -78,61 +96,32 @@ app.layout = html.Div(
                     """Analyse des retards des TGVs entre 2016 et 2019.
                     """
                 ),
-
-                html.Div(
-                    [
-                        daq.ToggleSwitch(
-                            id='my-toggle-switch',
-                            vertical=True,
-                            value=True,
-                            size=25,
-                            label='Toutes les gares',
-                        ),
-                        html.Div(id='toggle-switch-output')
-                    ]
-                ),
+                simpleButton(name='all-gare', id='my-daq-powerbutton', on=True),
                 html.Br(),
-                html.Div(
-                    children=[
-                        html.Div(
-                            className="div-for-dropdown",
-                            children=[
-                                # Dropdown for locations on map
-                                dcc.Dropdown(
-                                    id="gare-depart",
-                                    options=[
-                                        {"label": i, "value": i}
-                                        for i in gares
-                                    ],
-                                    placeholder="Gare de départ",
-                                    value='BORDEAUX ST JEAN'
-                                )
-                            ],
-                        ),
+                NamedDropdown(
+                    name="Gare de départ ",
+                    id="gare-depart",
+                    options=[
+                        {"label": i, "value": i}
+                        for i in gares
                     ],
+                    placeholder="Gare de départ",
+                    value='PARIS MONTPARNASSE',
+                    # clearable=False,
+                    # searchable=False,
                 ),
-
-                html.Div(
-                    children=[
-                        html.Div(
-                            className="div-for-dropdown",
-                            children=[
-                                # Dropdown for locations on map
-                                dcc.Dropdown(
-                                    id="gare-arrivee",
-                                    options=[
-                                        {"label": i, "value": i}
-                                        for i in gares 
-                                    ],
-                                    placeholder="Gare d'arrivée",
-                                    value='PARIS MONTPARNASSE',
-                                )
-                            ],
-                        ),
+                NamedDropdown(
+                    name="Gare d'arrivée ",
+                    id="gare-arrivee",
+                    options=[
+                        {"label": i, "value": i}
+                        for i in gares
                     ],
+                    placeholder="Gare d'arrivée",
+                    value='BORDEAUX ST JEAN',
+                    # clearable=False,
+                    # searchable=False,
                 ),
-
-
                 dcc.Markdown(
                     children=[
                         "Source: [Open Data SNCF](https://data.sncf.com/explore/dataset/regularite-mensuelle-tgv-aqst/information/?sort=periode)"
@@ -154,14 +143,28 @@ app.layout = html.Div(
                         html.Div(
                             className='KPIs',
                             children=[
-                                dcc.Graph(id='kpi-1'),
-                                dcc.Graph(id='kpi-2'),
-                                dcc.Graph(id='kpi-3'),
-                                dcc.Graph(id='kpi-4'),
-                                dcc.Graph(id='kpi-5'),
-                                # dcc.Graph(id='kpi-1'),
+                                
+                                html.Div(children=[dcc.Graph(id='kpi-1'),html.Span('Trains prévus')]),
+                                html.Div(children=[dcc.Graph(id='kpi-2'),html.Span('Trains retardés')]),
+                                html.Div(children=[dcc.Graph(id='kpi-3'),html.Span('Trains annulés')]),
+                                html.Div(children=[dcc.Graph(id='kpi-4'),html.Span('Retard moyen')]),
+                                html.Div(children=[dcc.Graph(id='kpi-5'),html.Span('Retard cumulé')]),
+                                # dcc.Graph(id='kpi-2'),
+                                # dcc.Graph(id='kpi-3'),
+                                # dcc.Graph(id='kpi-4'),
+                                # dcc.Graph(id='kpi-5')
                             ]
                         ),
+                        # html.Div(
+                        #     className='KPItitle',
+                        #     children=[
+                        #         html.P('kpi1'),
+                        #         html.P('kpiiiiiiiiiiii2'),
+                        #         html.P('kpi3'),
+                        #         html.P('kpi4'),
+                        #         html.P('kpi5'),
+                        #     ]
+                        # ),
                         html.Div(
                             className='TimeSelector',
                             children=[
@@ -174,7 +177,7 @@ app.layout = html.Div(
                                     marks=marks_data,
                                     value=min_max_date_value
                                 ),
-                                html.P('')
+                                # html.P('')
                             ],
                         ),
                     ]
