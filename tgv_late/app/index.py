@@ -1,17 +1,24 @@
+# Import classic lib
+import sys
+import random
+import numpy as np
+import pandas as pd
+from datetime import datetime as dt
+
+# Import dash library and related ones
 import dash
 import dash_daq as daq
 import dash_core_components as dcc
 import dash_html_components as html
-import pandas as pd
-import numpy as np
-import random
-
 from dash.dependencies import Input, Output
 from plotly import graph_objs as go
-from datetime import datetime as dt
+
+# Import logging
+import logging
+import logzero
+from logzero import logger
 
 # Importing personnal functions 
-import sys
 sys.path.append('/Users/thibaud/Documents/Python_scripts/02_Projects/SNCF/open_data/')
 import sncf_utils as f
 
@@ -23,8 +30,15 @@ app = dash.Dash(
 # Creating server
 server = app.server
 
+# Loading necessary token
 mapbox_access_token = f.get_token('../../dash.token')
 
+# Initiating logger
+logzero.loglevel(logging.DEBUG)
+# logger.debug("Debug")
+# logger.info("Info")
+# logger.warning("Warning")
+# logger.error("Error")
 
         
 
@@ -32,10 +46,17 @@ mapbox_access_token = f.get_token('../../dash.token')
 ######################################### DATA PREP ########################################
 ############################################################################################
 
+# Starting app
+logger.error('*'*80)
+logger.error('Initialisation de l\'Application')
+logger.error('*'*80)
+
 # Loading necessary data
 df = f.load_pickle('dash_first_try.p')
+logger.info(df.head())
+
 gares = df.pipe(f.get_gares)
-print(df.head())
+logger.info(gares)
 
 min_date = 2014 #df['periode'].min()
 max_date = 2019 #df['periode'].max()
@@ -61,7 +82,7 @@ def NamedDropdown(name, **kwargs):
         ],
     )
 
-def simpleButton(name, **kwargs):
+def OnOffButton(name, **kwargs):
     return html.Div(
         style={"margin": "10px 0px"},
         children=[
@@ -69,6 +90,13 @@ def simpleButton(name, **kwargs):
         ],
     )
 
+def simpleButton(name, **kwargs):
+    return html.Div(
+        style={"margin": "10px 0px"},
+        children=[
+            daq.StopButton(**kwargs)
+        ],
+    )
 
 ############################################################################################
 ######################################### MAIN APP #########################################
@@ -96,7 +124,7 @@ app.layout = html.Div(
                     """Analyse des retards des TGVs entre 2016 et 2019.
                     """
                 ),
-                simpleButton(name='all-gare', id='my-daq-powerbutton', on=True),
+                simpleButton(name='all-gare', id='all-gare-button'),#, on=True),
                 html.Br(),
                 NamedDropdown(
                     name="Gare de départ ",
@@ -106,7 +134,7 @@ app.layout = html.Div(
                         for i in gares
                     ],
                     placeholder="Gare de départ",
-                    value='PARIS MONTPARNASSE',
+                    #value='PARIS MONTPARNASSE',
                     # clearable=False,
                     # searchable=False,
                 ),
@@ -118,7 +146,7 @@ app.layout = html.Div(
                         for i in gares
                     ],
                     placeholder="Gare d'arrivée",
-                    value='BORDEAUX ST JEAN',
+                    #value='BORDEAUX ST JEAN',
                     # clearable=False,
                     # searchable=False,
                 ),
@@ -237,32 +265,31 @@ app.layout = html.Div(
 #########################################  FONCTIONS #######################################
 ############################################################################################
 
-
 def filter_df(df, depart=None, arrivee=None, time_filter=None):
     dff = df.copy()
     start, end = None, None
    
-    print('> FILTERING', dff.shape)
-    print('-', depart, arrivee, start, end)
+    logger.info('> FILTERING : {}'.format(dff.shape))
+    logger.info('- Dep : {} - Arr : {} - Start - {} End - {}'.format(depart, arrivee, start, end))
     if time_filter:
-        print(time_filter)
+        logger.debug(time_filter)
         start = pd.to_datetime(str(time_filter[0]))
         end = pd.to_datetime(str(time_filter[1]))
 
-    print(start, end)
+    logger.debug('{}{}'.format(start, end))
     if depart:
         dff = dff[dff['gare_depart']==depart]
-        print('depart', dff.shape)
+        logger.debug('depart {}'.format(dff.shape))
     if arrivee:
         dff = dff[dff['gare_arrivee']==arrivee]
-        print('arrivee', dff.shape)
+        logger.debug('arrivee {}'.format(dff.shape))
     if start:
-        print('start', dff.shape)
         dff = dff[dff['periode']>=start]
+        logger.debug('start {}'.format(dff.shape))
     if end:
-        print('end', dff.shape)
         dff = dff[dff['periode']<=end]
-    print('final', dff.shape)
+        logger.debug('end {}'.format(dff.shape))
+    logger.debug('final', dff.shape)
     return dff
 
 def circle_number(value):
@@ -310,12 +337,30 @@ input_list =[
 ]
 
 
-@app.callback([Output('gare-arrivee', 'options'),Output('gare-arrivee', 'value')],
+@app.callback([
+    Output('gare-arrivee', 'options'),
+    Output('gare-arrivee', 'value')],
     [Input(component_id='gare-depart', component_property='value')])
 def reselect_arrivee(depart, dff=df):
-    print('> Arrival selection (from {})'.format(depart))
-    gare_arrivee = df.pipe(f.get_gare_complement, depart)
-    return [{"label": i, "value": i} for i in gare_arrivee], gare_arrivee[0]
+    logger.info('> Arrival selection (from {})'.format(depart))
+    if depart:
+        gare_arrivee_list = df.pipe(f.get_gare_complement, depart)
+        gare_displayed = gare_arrivee_list[0]
+    else:
+        gare_arrivee_list = df.pipe(f.get_gares)
+        gare_displayed = None
+
+        
+    gare_arrivee_dict = [{"label": i, "value": i} for i in gare_arrivee_list]
+
+    return gare_arrivee_dict, gare_displayed
+
+
+@app.callback([Output('gare-depart', 'value')],
+    [Input(component_id='all-gare-button', component_property='n_clicks')])
+def reset_gare(n_click, dff=df):
+    logger.info('>>>> ALL MODIF') ; logger.info(n_click) ; logger.info('*'*50)
+    return [None] #, 'pouet' #[{"label": i, "value": i} for i in gare_arrivee]#, gare_arrivee[0]
 
 
 ##############################
@@ -326,7 +371,7 @@ def reselect_arrivee(depart, dff=df):
         Input(component_id='choix-distribution-retard', component_property='value'),
         Input(component_id='couleur-distribution-retard', component_property='value')])
 def distribution_retard(depart, arrivee, time_filter, choix_radio, couleur, dff=df):
-    print('> Graphique 1 : Distribution Retard')
+    logger.info('> Graphique 1 : Distribution Retard')
     dff = df.pipe(filter_df, depart, arrivee, time_filter)
     
     # Select axes
@@ -360,7 +405,7 @@ def distribution_retard(depart, arrivee, time_filter, choix_radio, couleur, dff=
 
 @app.callback(Output('cause-retard', 'figure'),input_list)
 def cause_retard(depart, arrivee, time_filter, dff=df):
-    print('> Graphique 2 : Cause Retard')
+    logger.info('> Graphique 2 : Cause Retard')
     cause_retard = (df
         .pipe(filter_df, depart, arrivee, time_filter)
         .pipe(f.get_root_cause)
@@ -395,18 +440,18 @@ def cause_retard(depart, arrivee, time_filter, dff=df):
 
 @app.callback(Output('kpi-1', 'figure'),[Input(component_id='time-filter', component_property='value')])
 def kpi_1(input_, dff=df):
-    print('> KPI 1')   
+    logger.info('> KPI 1')   
     return circle_number(random.randint(1,99))
 
 @app.callback(Output('kpi-2', 'figure'),[Input(component_id='gare-depart', component_property='value')])
 def kpi_2(input_, dff=df):
-    print('> KPI 2')
+    logger.info('> KPI 2')
     return circle_number(random.randint(1,99))
 
 @app.callback(Output('kpi-3', 'figure'), input_list)
 def kpi_3(depart, arrivee,time_filter, dff=df):
-    print('> KPI 3')
-    print(time_filter)
+    logger.info('> KPI 3')
+    logger.debug(time_filter)
     dff = df.pipe(filter_df, depart, arrivee, time_filter)
     nombre_retard = dff['nbr_trains_retard_arrivee'].sum()
     circle = circle_number(nombre_retard)
@@ -473,7 +518,7 @@ def make_main_figure(debut, fin, time_, dff=df):
             'adresse':[value['location_adress'] for value in gare_position.values()]
         }
     ).set_index('gare')
-    print(df_gare.head())
+    logger.debug(df_gare.head())
 
     lat_atelier = df_gare['latitude'].to_list()
     lon_atelier =  df_gare['longitude'].to_list()
