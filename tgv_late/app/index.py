@@ -128,15 +128,12 @@ def simpleButton(name, **kwargs):
 ######################################### MAIN APP #########################################
 ############################################################################################
 
-
 app.layout = html.Div(
     className="content",
     children=[
-
         ##############################
         # MENU CONTEXTUEL
         ##############################
-        html.Div(id='json_fitlered'),
         html.Nav(
             children=[
                 html.Div(
@@ -163,8 +160,7 @@ app.layout = html.Div(
                         ),
                         simpleButton(name='all-gare', id='reset-button', buttonText='RESET'),#, on=True),
                     ]
-                ),
-            
+                ),            
                 html.Div(
                     className='card',
                     id='analyse-card',
@@ -216,8 +212,7 @@ app.layout = html.Div(
                     children=[
                         html.Div(
                             className='upperKPIFake',
-                            children=[
-                        
+                            children=[                        
                                 dcc.Loading(
                                     className='KPIs',
                                     children=[                           
@@ -241,8 +236,7 @@ app.layout = html.Div(
                                             step=1,
                                             marks=marks_data,
                                             value=min_max_date_value,
-                                            # color='crimson',
-                                            
+                                            # color='crimson',                                            
                                         ),
                                     ],
                                 ),
@@ -256,8 +250,7 @@ app.layout = html.Div(
                     children=[
                         html.Article(
                             className='leftGraph',
-                            children=[
-                               
+                            children=[                               
                                 html.Div(
                                     className='leftUpper',
                                     children=[
@@ -289,65 +282,29 @@ app.layout = html.Div(
                                         ),
                                     ],
                                 ),
-                                # html.P(),
                                 html.Div(
                                     className='leftDown',
                                     children=[
                                         dcc.Graph(id='cause-retard'),
                                         dcc.Graph(id='duree-retard'),
                                     ]
-                                ),
-                                # dcc.Loading(
-                                #     id="loading-1",
-                                #     children=[ dcc.Graph(id="distribution-retard"),],
-                                #     type="circle",
-                                #     color='crimson'
-                                # ),
-                                
-
-
-                           
-                            #html.P("Select any of the bars on the histogram to section data by time."),
-                                # dcc.Loading(
-                                #     id="loading-2",
-                                #     children=[dcc.Graph(id='cause-retard'),],
-                                #     # type="circle",
-                                #     # color='crimson'
-                                # ),
-                                
-                                
-                                
-                                
+                                ),                
                             ],
                         ),
-                        # html.Article(
-                        #     className='centerGraph',
-                        #     children=[
-                        #         html.P()
-                        #     ]
-                        # ),
                         html.Article(
-                            
                             className='rightMap',
                             children=[
-
-                                
                                 dcc.Loading(
                                     id="loading-3",
                                     children=[dcc.Graph(id='map-graph', config={ "scrollZoom": True}),],
                                     type="circle",
                                     color='crimson'
                                 ),
-                                # dcc.Graph(id='map-graph', config={ "scrollZoom": True}),
-                                
-                                
                                 html.Div(
                                     id="map-description",
                                     children=[
                                         "La liste des commentaires apparaitra ici", html.Br(),
-                                        #"Select any of the bars on the histogram to section data by time.",
                                         #dcc.Graph(id='individual_graph')
-
                                     ]
                                 ),
                             ]
@@ -362,15 +319,6 @@ app.layout = html.Div(
 ############################################################################################
 #########################################  FONCTIONS #######################################
 ############################################################################################
-
-
-
-
-
-
-# @app.callback(Output("loading-icon", "children"))
-
-
 
 
 def circle_number(value, max_value=100):
@@ -443,6 +391,7 @@ def filter_df(df, depart=None, arrivee=None, time_filter=None):
 #################################### CALCULATIONS ##########################################
 ############################################################################################
 
+
 ##############################
 # DISTRIBUTION DES RETARDS
 ##############################
@@ -472,7 +421,6 @@ def make_cause_retard(df, depart, arrivee):
     causes = list(cause_retard.keys())
     values = list(cause_retard.values())
 
-#    colors = ['lightslategray',] * len(causes)
     colors = ['#1E1E1E',] * len(causes)
     max_index = values.index(max(values))
     colors[max_index] = 'crimson'
@@ -497,7 +445,6 @@ def make_duree_retard(df, depart, arrivee):
     causes = list(cause_retard.keys())
     values = list(cause_retard.values())
 
-#    colors = ['lightslategray',] * len(causes)
     colors = ['#1E1E1E',] * len(causes)
     max_index = values.index(max(values))
     colors[max_index] = 'crimson'
@@ -510,6 +457,7 @@ def make_duree_retard(df, depart, arrivee):
         title='Durée des retards',
         )
     return {"data": data, "layout": layout}
+
 
 ##############################
 # CREATION DE LA CARTE
@@ -698,7 +646,6 @@ def distribution_retard(click_valider, click_reset, choix_radio, couleur, time_f
 ############################################################################################
 ######################################### RUNNING ##########################################
 ############################################################################################
-
 
 if __name__ == '__main__':
     app.run_server(debug=True, use_reloader=True)
