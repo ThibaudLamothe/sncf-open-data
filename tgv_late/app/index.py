@@ -260,7 +260,10 @@ app.layout = html.Div(
                                             children=[
                                                 html.P('Axe des y'),
                                                 dcc.RadioItems(
-                                                    className='radio',
+                                                    className='radioButton',
+                                                    inputClassName='radio',
+                                                    labelClassName='label',
+                                                    labelStyle={'display': 'inline-block'},
                                                     id='choix-distribution-retard',
                                                     options=[
                                                         {'label': 'Nombre de trains', 'value': 'train'},
@@ -270,7 +273,10 @@ app.layout = html.Div(
                                                 ),
                                                 html.P('Méthode de coloration'),
                                                 dcc.RadioItems(
-                                                    className='radio',
+                                                    className='radioButton',
+                                                    inputClassName='radio',
+                                                    labelClassName='label',
+                                                    labelStyle={'display': 'inline-block'},
                                                     id='couleur-distribution-retard',
                                                     options=[
                                                         {'label': 'Par année', 'value': 'an'},

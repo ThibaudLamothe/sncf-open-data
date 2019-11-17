@@ -12,39 +12,59 @@ rose : #C2165E */
     display: flex;
     /* justify-content: space-around; */
     flex-direction: column;
-    /* background-color: yellow; */
+    background-color: yellow;
     margin:auto;
+    width:20%;
     /* flex-direction: column; */
     /* display: block; */
     /* cursor: pointer; */
 }
 
-.radio{
-    display: block;
+.radioButton{
+    background-color: grey;
+    /* display: block; */
+}
+
+/* .radio{ */
+    /* display: block; */
     /* justify-content: space-around; */
     /* flex-direction: column; */
-    background-color: orange;
+    /* background-color: orange; */
     /* margin:auto; */
     /* flex-direction: column; */
     /* display: block; */
     /* cursor: pointer; */
-}
+/* } */
 
 
-#couleur-distribution-retard{
+/* #couleur-distribution-retard{ */
     /* margin:auto; */
     /* background-color: green; */
-    display: block;
-}
+    /* display: inline-block; */
+/* } */
 
 /* When the radio button is checked, add a blue background */
-/* input[type="radio"]:checked {
+
+input[type="radio"]:checked {
     color:blue;
     background-color: crimson;
-} */
+}
+
+/* input[type="radioB"] {
+    /* vertical-align: middle; */
+    /* display: inline-block; */
+/* }  */
 
 input[type="radio"] {
-    vertical-align: middle;
+    background-color: red;
+    display: inline;
+}
+
+label > .label-body {
+    background-color: blue;
+    display: inline-block;
+    margin-left: .5rem;
+    font-weight: normal;
 }
 
 
