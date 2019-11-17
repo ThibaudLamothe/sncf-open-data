@@ -7,5 +7,20 @@ plotly
 dash-table-experiments 
 numpy
 pandas==0.24.0
-#gunicorn
-#google-api-python-client
+
+flask_caching
+logzero
+
+gunicorn
+google-api-python-client
+
+
+# seaborn
+# matplotlib
+# requests
+# jupyter
+# jupyterlab
+# autopep8
+# sklearn
+# geopy
+# pylint
