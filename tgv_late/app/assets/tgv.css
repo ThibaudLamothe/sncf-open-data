@@ -1,6 +1,10 @@
+/* ____________________________________________________________*/
+/* __________________________GENERAL___________________________*/
+/* ____________________________________________________________*/
 body {
-    background-color: rgb(205, 205, 206);
-    color: #d8d8d8;
+    background-color: rgb(222, 222, 222);
+    color: crimson;
+    font:caption;
     margin: 0;
     padding: 0; 
   }
@@ -8,77 +12,122 @@ body {
 .content
 {
     display: flex;
-    /* background-color: purple; */
     justify-content: space-between;
+    background-color: purple;
+    background-color: rgb(222, 222, 222);
+    background-color: #1E1E1E;
+    /* margin:10px; */
+    height:820px;
 }
 
 nav {
-    /* background-color: #1E1E1E; */
-    margin:50px;
-    min-width: 300px;
-    max-width: 100%;
-    background-color: red;
-    margin:15px;
-    max-height:100%;
+    background-color: #1E1E1E;
+    
+    color:rgb(205, 205, 206);
+    /* min-width: 300px; */
+    
+    width: 20%;
+    height:820px;
+    text-align: center;
 }
 
 section
 {
     display: flex;
     flex-direction: column;
+    background-color:gold;
+    background-color: rgb(222, 222, 222);
     background-color: #1E1E1E;
-    max-width: 80%;
-    margin: 15px;
-    flex:1;
+    margin:10px;
+    /* flex:1; */
     align-items: center;
-    height:800px;
+    max-height:100%;
+    /* max-width:80%; */
+    /* min-width:80%; */
+    width:80%;
 }
 
-/* SECTION : KPI */
+
+/* ____________________________________________________________*/
+/* ____________________________KPI_____________________________*/
+/* ____________________________________________________________*/
+
 
 .upperKPI
 {
+    background-color: royalblue;
+    background-color: rgb(222, 222, 222);
+    background-color: #1E1E1E;
+    width:100%;
+    height:20%;
+}
+.upperKPIFake{
     display: flex;
     flex-direction: column;
     background-color: green;
-    width:95%;
-    margin: 5px;
-    height:20%;
+    background-color: #1E1E1E;
+    background-color: rgb(222, 222, 222);
+    margin: 10px;
+    margin-bottom: 20px;
     
+    max-width:100%;
+    /* overflow: auto; */
 }
 
 .KPIs
 {
     display: flex;
     justify-content: space-around;
-    background-color: greenyellow;
     margin:10px;
     height: 65%;
-    color:rgb(204, 255, 255);
-    font:caption;
+    max-width: 100%;
+    overflow: auto;
+    /* background-color:rgb(204, 255, 255); */
+    /* font:caption; */
+    
 }
+
+/* .rond_cercle{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+} */
 
 
 .TimeSelector{
     display: flex;
     flex-direction: column;
-    margin:auto;
-    width:90%;
+    margin:10px;
+    max-width:100%;
     height:25%;
     text-align:center;
-    background-color: rgb(131, 214, 7);
+    color:crimson;
+    /* background-color: rgb(131, 214, 7); */
 }
 
-/* SECTION : GRAPHIQUES */
+/* label{
+    color:crimson;
+} */
+
+/* ____________________________________________________________*/
+/* ________________________GRAPHIQUES__________________________*/
+/* ____________________________________________________________*/
 
 .graphiques{
+    overflow: auto;
     display: flex;
-    margin:auto;
+    margin:10px;
+    /* padding:10px; */
     background-color: orange;
-    width:95%;
+    background-color: #1E1E1E;
+    
+    width:100%;
+    /* min-width:90%; */
     height:80%;
 }
 
+/* PARTIE GAUCHE
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
 
 .leftGraph{
     display: flex;
@@ -86,23 +135,75 @@ section
     flex-direction: column;
     justify-content: center;
     margin:10px;
-    background-color: magenta;
-    width : 50%;
-    height: 95%;
+    /* background-color: peru; */
+    background-color: #1E1E1E;
+    background-color: rgb(222, 222, 222);
     
+    width : 60%;
+    max-height: 100%;
+   
 }
- 
+
+.leftUpper{
+    display: flex;
+    overflow:auto;
+    /* flex-direction: column; */
+    /* justify-content: center; */
+    margin:10px;
+    /* background-color: magenta; */
+    border: 1px solid magenta;
+    max-width : 100%;
+    height: 110%;
+   
+}
+
 #distribution-retard{
+    /* background-color: red; */
     margin:auto;
     width:90%;
-    height:40%;
+    height:90%;
+    /* border: 1px solid #1E1E1E; */
 }
+
+
+.leftDown{
+    display: flex;
+    overflow:auto;
+    /* flex-direction: column; */
+    /* justify-content: center; */
+    margin:10px;
+    /* background-color: olivedrab; */
+    max-width : 100%;
+    height: 90%;
+   
+}
+
  
 #cause-retard{
+    /* background-color: pink; */
     margin:auto;
-    width:90%;
-    height:40%;
+    width:50%;
+    height:90%;
+    border: 1px solid pink;
+
 } 
+#duree-retard{
+    /* background-color: red; */
+    margin:auto;
+    width:50%;
+    height:90%;
+    border: 1px solid red;
+}
+
+
+/* PARTIE DROITE
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+
+.centerGraph{
+    /* background-color: greenyellow; */
+    width : 25%;
+
+}
 
 .rightMap{
     display: flex;
@@ -111,84 +212,35 @@ section
     justify-content: center;
     margin:10px;
     background-color: orangered;
-
-    width:50%;
-    height:95%;
+    background-color: #1E1E1E;
+    background-color: rgb(222, 222, 222);
+    width:40%;
+    max-height:100%;
 }
 
+#loading-3{
+    background-color: yellow;
+    overflow:auto;
+    margin:10px;
+    height:80%;
+    max-width:100%;
+}
 
 #map-graph{
-    margin:auto;
-    height:95%;
-    width:95%;
+    /* background-color: paleturquoise; */
+    margin:10px;
+    /* overflow:auto;
+    margin:10px;
+    height:80%;*/
+    max-width:100%;
+    border: 1px solid yellow;
 }
 
-
-
-
-
-/* Dropdowns
-–––––––––––––––––––––––––––––––––––––––––––––––––– */
-.Select-control {
-    color: #a5b1cd;
+#map-description{
+    /* background-color: green; */
+    margin:10px;
+    height:20%;
+    max-width:100%; 
+    border: 1px solid blue;
 }
 
-.Select {
-    color: #a5b1cd;
-}
-
-.Select-menu-outer {
-    background-color: #2f3445;
-    border: 1px solid gray;
-}
-
-.Select div {
-    background-color: #2f3445;
-}
-
-.Select-menu-outer div:hover {
-    background-color: rgba(255, 255, 255, 0.01);
-}
-
-.Select-value-label {
-    color: #a5b1cd !important;
-}
-
-.Select--single > .Select-control .Select-value, .Select-placeholder {
-    border: 1px solid gray;
-    border-radius: 4px;
-}
-
-.card {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    width: 80%;
-    padding: 2rem 0;
-}
-
-#last-card {
-    border-bottom: none;
-}
-
-.graph-title {
-    font-size: 2rem;
-    margin: 15% 0 0 25%;
-}
-
-#button-zero-threshold {
-    background-color: #2f3445;
-    color: #a5b1cd;
-    border-color: gray;
-}
-
-#button-zero-threshold:hover {
-    border-color: white;
-}
-
-#button-card {
-    display: flex;
-    flex-direction: column;
-}
-
-#first-card {
-    padding-top: 0;
-}
