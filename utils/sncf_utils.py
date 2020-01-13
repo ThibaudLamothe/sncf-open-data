@@ -25,7 +25,6 @@ def list_pickle():
     pickle_list = [i for i in file_list if '.p' in i]
     print(pickle_list)
 
-# Version améliorée par rapport à general
 def encode_serie(serie):
     lbl = LabelEncoder()
     lbl.fit(serie.apply(str).values)

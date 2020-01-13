@@ -5,10 +5,8 @@
 
 # Import classic lib
 import sys
-import random
 import numpy as np
 import pandas as pd
-from datetime import datetime as dt
 
 # Import dash library and related ones
 import dash
@@ -25,8 +23,7 @@ from logzero import logger
 
 # Importing personnal functions 
 sys.path.append('/Users/thibaud/Documents/Python_scripts/02_Projects/SNCF/open_data/')
-import sncf_utils as f
-
+from utils import sncf_utils as f
 
 ############################################################################################
 #################################### APP INITIATION ########################################
@@ -42,22 +39,18 @@ server = app.server
 
 # Initiating logger
 logzero.loglevel(logging.DEBUG)
-# logger.debug("Debug")
-# logger.info("Info")
-# logger.warning("Warning")
-# logger.error("Error")
-        
+
 # Display app start
-logger.error('*'*80)
+logger.error('*' * 80)
 logger.error('Initialisation de l\'Application')
-logger.error('*'*80)
+logger.error('*' * 80)
 
 ############################################################################################
 ########################################## LOADING #########################################
 ############################################################################################
 
 # Loading map token
-mapbox_access_token = f.get_token('../../dash.token')
+mapbox_access_token = f.get_token('../../utils/dash.token')
 
 # Loading main data
 df = f.load_pickle('dash_first_try.p')
@@ -67,22 +60,23 @@ logger.info(df.head())
 gare_position = f.load_pickle('gare_gps.p')
 df_gare = pd.DataFrame(
     {
-        'gare':[key for key in gare_position.keys()],
-        'latitude':[value['latitude'] for value in gare_position.values()],
-        'longitude':[value['longitude'] for value in gare_position.values()],
-        'adresse':[value['location_adress'] for value in gare_position.values()]
+        'gare': [key for key in gare_position.keys()],
+        'latitude': [value['latitude'] for value in gare_position.values()],
+        'longitude': [value['longitude'] for value in gare_position.values()],
+        'adresse': [value['location_adress'] for value in gare_position.values()]
     }
 ).set_index('gare')
-    
+
 # Computing gare liste
 gares = df.pipe(f.get_gares)
 logger.info(gares)
 
 # Setting date for application purpose
-min_date = 2014 #df['periode'].min()
-max_date = 2019 #df['periode'].max()
-min_max_date_value=[min_date, max_date]
+min_date = 2014  # df['periode'].min()
+max_date = 2019  # df['periode'].max()
+min_max_date_value = [min_date, max_date]
 marks_data = f.slicer(min_date, max_date)
+
 
 def min_max_date(df):
     min_date = df['Year'].min()
@@ -108,17 +102,19 @@ def NamedDropdown(name, **kwargs):
         ],
     )
 
+
 def OnOffButton(name, **kwargs):
     return html.Div(
-        #style={"margin": "auto"},
+        # style={"margin": "auto"},
         children=[
             daq.PowerButton(**kwargs)
         ],
     )
 
+
 def simpleButton(name, **kwargs):
     return html.Div(
-        #style={"margin": "auto"},
+        # style={"margin": "auto"},
         children=[
             daq.StopButton(**kwargs)
         ],
@@ -328,30 +324,30 @@ app.layout = html.Div(
 
 
 def circle_number(value, max_value=100):
-    values = [max_value-value,value]
-    colors = ['rgba(0, 0, 0,0)', "crimson"]#"rgb(204, 255, 255)"]
-    direction='clockwise'    
-    rotation=0 if value>=max_value/2 else 360/max_value*value
+    values = [max_value - value, value]
+    colors = ['rgba(0, 0, 0,0)', "crimson"]  # "rgb(204, 255, 255)"]
+    direction = 'clockwise'
+    rotation = 0 if value >= max_value / 2 else 360 / max_value * value
 
     data = [go.Pie(
         values=values,
         hole=.9,
         showlegend=False,
-        marker={'colors':colors},
+        marker={'colors': colors},
         textinfo="none",
         direction=direction,
         rotation=rotation,
-        )]
+    )]
 
     layout = go.Layout(
-        margin={'l':0, 'r':0, 't':0, 'b':0},
+        margin={'l': 0, 'r': 0, 't': 0, 'b': 0},
         width=70,
         height=70,
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
         annotations=[
             {
-                "font": {"size": 15, "color":"crimson"},
+                "font": {"size": 15, "color": "crimson"},
                 "showarrow": False,
                 "text": value,
                 "align": "center",
@@ -364,30 +360,30 @@ def circle_number(value, max_value=100):
 def filter_df(df, depart=None, arrivee=None, time_filter=None):
     logger.info('> FILTERING - taille du dataset {}'.format(df.shape))
     logger.info('- Depart : {} - Arrivée : {}'.format(depart, arrivee))
-   
+
     # Initialisation & interprésttion des dates
     dff = df.copy()
-    start, end = None, None     
+    start, end = None, None
     if time_filter:
         logger.debug('Time filter : {}'.format(time_filter))
         start = pd.to_datetime(str(time_filter[0]))
         end = pd.to_datetime(str(time_filter[1]))
     logger.info('Date selectionnées : Start : {} - End : {}'.format(start, end))
-    
+
     # Filtres consécutifs
     if depart:
-        dff = dff[dff['gare_depart']==depart]
+        dff = dff[dff['gare_depart'] == depart]
         logger.debug('Taille post-depart : {}'.format(dff.shape))
     if arrivee:
-        dff = dff[dff['gare_arrivee']==arrivee]
+        dff = dff[dff['gare_arrivee'] == arrivee]
         logger.debug('Taille post-arrivee {}'.format(dff.shape))
     if start:
-        dff = dff[dff['periode']>=start]
+        dff = dff[dff['periode'] >= start]
         logger.debug('Taille post-start {}'.format(dff.shape))
     if end:
-        dff = dff[dff['periode']<=end]
+        dff = dff[dff['periode'] <= end]
         logger.debug('Taille post-end {}'.format(dff.shape))
-    
+
     # Filtres effectués
     logger.debug('Taille finale {}'.format(dff.shape))
     return dff
@@ -404,15 +400,15 @@ def filter_df(df, depart=None, arrivee=None, time_filter=None):
 def make_distribution_retard(dff, choix_radio, couleur):
     # Select axes
     x = dff['nbr_trains_retard_depart'].tolist()
-    if choix_radio=='train':
+    if choix_radio == 'train':
         y = dff['nbr_trains_retard_arrivee'].tolist()
-    else: # choix==minute
+    else:  # choix==minute
         y = dff['retard_moyen_trains_retard_arrivee__min'].tolist()
-    
+
     # Select color_scheme
-    if couleur=='an':
+    if couleur == 'an':
         colors = dff.pipe(f.transform_category_to_color, 'annee').tolist()
-    else: # couleur==gare
+    else:  # couleur==gare
         colors = dff.pipe(f.transform_category_to_color, 'gare_arrivee').tolist()
     return x, y, colors
 
@@ -427,17 +423,17 @@ def make_cause_retard(df, depart, arrivee):
     causes = list(cause_retard.keys())
     values = list(cause_retard.values())
 
-    colors = ['#1E1E1E',] * len(causes)
+    colors = ['#1E1E1E', ] * len(causes)
     max_index = values.index(max(values))
     colors[max_index] = 'crimson'
 
-    data=[go.Bar(x=causes, y=values, marker_color=colors)]
-    layout=go.Layout(
-        margin={'l': 25,'b': 25,'t': 25,'r': 25},
+    data = [go.Bar(x=causes, y=values, marker_color=colors)]
+    layout = go.Layout(
+        margin={'l': 25, 'b': 25, 't': 25, 'r': 25},
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
         title='Origine des retards',
-        )
+    )
     return {"data": data, "layout": layout}
 
 
@@ -451,17 +447,17 @@ def make_duree_retard(df, depart, arrivee):
     causes = list(cause_retard.keys())
     values = list(cause_retard.values())
 
-    colors = ['#1E1E1E',] * len(causes)
+    colors = ['#1E1E1E', ] * len(causes)
     max_index = values.index(max(values))
     colors[max_index] = 'crimson'
 
-    data=[go.Bar(x=causes, y=values, marker_color=colors)]
-    layout=go.Layout(
-        margin={'l': 25,'b': 25,'t': 25,'r': 25},
+    data = [go.Bar(x=causes, y=values, marker_color=colors)]
+    layout = go.Layout(
+        margin={'l': 25, 'b': 25, 't': 25, 'r': 25},
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
         title='Durée des retards',
-        )
+    )
     return {"data": data, "layout": layout}
 
 
@@ -470,24 +466,24 @@ def make_duree_retard(df, depart, arrivee):
 ##############################
 def make_map(depart, arrivee, df_gare=df_gare):
     logger.info('> Generating map')
-    
+
     # Always the same
     lat_atelier = df_gare['latitude'].to_list()
-    lon_atelier =  df_gare['longitude'].to_list()
+    lon_atelier = df_gare['longitude'].to_list()
     noms_ateliers = df_gare['adresse'].to_list()
 
     # Depend on gare de depart et d'arrivee
     colors = ['crimson' if gare in [depart, arrivee] else 'rgb(205, 205, 206)' for gare in gare_position.keys()]
     size = [30 if gare in [depart, arrivee] else 15 for gare in gare_position.keys()]
-    
+
     trace_map = dict(
         type='scattermapbox',
         lon=lon_atelier,
         lat=lat_atelier,
-        text=list(gare_position.keys()),#noms_ateliers,
-        name = "Gares",
-        marker=dict(size=size,color=colors,opacity=0.7),
-         # customdata=customdata,
+        text=list(gare_position.keys()),  # noms_ateliers,
+        name="Gares",
+        marker=dict(size=size, color=colors, opacity=0.7),
+        # customdata=customdata,
     )
 
     layout_map = dict(
@@ -495,7 +491,7 @@ def make_map(depart, arrivee, df_gare=df_gare):
         # height=750,   
         font=dict(color='#1E1E1E'),
         titlefont=dict(color='#1E1E1E', size='22'),
-        margin=dict(l=15,r=15,b=15,t=35),
+        margin=dict(l=15, r=15, b=15, t=35),
         hovermode="closest",
         border=dict(color='#1E1E1E'),
         # plot_bgcolor="#191A1A",
@@ -508,11 +504,12 @@ def make_map(depart, arrivee, df_gare=df_gare):
         mapbox=dict(
             accesstoken=mapbox_access_token,
             style="dark",
-            center=dict(lon=2.33,lat=46.8),
+            center=dict(lon=2.33, lat=46.8),
             zoom=4.4,
         )
     )
     return dict(data=[trace_map], layout=layout_map)
+
 
 ############################################################################################
 ################################# GENERAL CALLBACKS ########################################
@@ -527,7 +524,7 @@ def make_map(depart, arrivee, df_gare=df_gare):
     Output('gare-arrivee', 'value')],
     [Input(component_id='gare-depart', component_property='value')])
 def reselect_arrivee(depart, dff=df):
-    logger.info('> SELECT arrivee - gare de départ {}'.format(depart))    
+    logger.info('> SELECT arrivee - gare de départ {}'.format(depart))
     if depart:
         gare_arrivee_list = df.pipe(f.get_gare_complement, depart)
         gare_displayed = gare_arrivee_list[0]
@@ -541,11 +538,11 @@ def reselect_arrivee(depart, dff=df):
 # RESET DU CHOIX DES GARES
 ##############################
 @app.callback([Output('gare-depart', 'value'), Output(component_id='time-filter', component_property='value')],
-    [Input(component_id='reset-button', component_property='n_clicks')])
+              [Input(component_id='reset-button', component_property='n_clicks')])
 def reset_gare(n_click, dff=df):
     logger.info('> RESET : suppression des filtres')
     logger.info(n_click)
-    return [None, [2014,2019]]
+    return [None, [2014, 2019]]
 
 
 ##############################
@@ -575,21 +572,21 @@ def reset_gare(n_click, dff=df):
 def update(n_click_val, n_click_reset, time_filter, depart, arrivee, dff=df):
     logger.info('> MULITPLE CREATION : KPIs + Carte')
     logger.debug(time_filter)
-    
+
     # Filtering 
     dff = df.pipe(filter_df, depart, arrivee, time_filter)
-    
+
     # Kpi preparation
     nombre_prevu = int(dff['nbr_circulations_prevues'].sum())
     nombre_retard = int(dff['nbr_trains_retard_arrivee'].sum())
     nombre_annule = int(dff['nbr_trains_annules'].sum())
     retard_moyen = np.round(dff['retard_moyen_trains_retard_arrivee__min'].mean(), 2)
     retard_cumule = int(retard_moyen * nombre_retard / 60)
-    
+
     kpi1 = circle_number(nombre_prevu, max_value=nombre_prevu)
     kpi2 = circle_number(nombre_retard, max_value=nombre_prevu)
     kpi3 = circle_number(nombre_annule, max_value=nombre_prevu)
-    kpi4 = circle_number(retard_moyen,retard_moyen)
+    kpi4 = circle_number(retard_moyen, retard_moyen)
     kpi5 = circle_number(retard_cumule, retard_cumule)
 
     # Graphique preparation
@@ -599,8 +596,7 @@ def update(n_click_val, n_click_reset, time_filter, depart, arrivee, dff=df):
     # Map preparation
     carte = make_map(depart, arrivee)
 
-    return kpi1, kpi2, kpi3, kpi4, kpi5, cause_retard, duree_retard,carte
-
+    return kpi1, kpi2, kpi3, kpi4, kpi5, cause_retard, duree_retard, carte
 
 
 ##############################
@@ -609,7 +605,7 @@ def update(n_click_val, n_click_reset, time_filter, depart, arrivee, dff=df):
 @app.callback(
     Output('distribution-retard', 'figure'),
     [
-        Input(component_id='valider-button', component_property='n_clicks'), 
+        Input(component_id='valider-button', component_property='n_clicks'),
         Input(component_id='reset-button', component_property='n_clicks'),
         Input(component_id='choix-distribution-retard', component_property='value'),
         Input(component_id='couleur-distribution-retard', component_property='value'),
@@ -622,25 +618,25 @@ def update(n_click_val, n_click_reset, time_filter, depart, arrivee, dff=df):
 )
 def distribution_retard(click_valider, click_reset, choix_radio, couleur, time_filter, depart, arrivee, dff=df):
     logger.info('> GRAPHIQUE 1 : Distribution Retard')
-    
+
     # Prepare data
     dff = df.pipe(filter_df, depart, arrivee, time_filter)
-    x, y, colors = make_distribution_retard(dff, choix_radio, couleur)    
-    
+    x, y, colors = make_distribution_retard(dff, choix_radio, couleur)
+
     # Prepare graph
-    data=[
+    data = [
         go.Scatter(
             x=x,
             y=y,
             mode='markers',
-            marker=dict(color=colors,)#     size=[40, 60, 80, 100],
+            marker=dict(color=colors, )  # size=[40, 60, 80, 100],
         )
     ]
-    
+
     # Make it beautiful
-    margin=40
-    layout=go.Layout(
-        margin={'l': 25,'b': 20,'t': 35,'r': 15},
+    margin = 40
+    layout = go.Layout(
+        margin={'l': 25, 'b': 20, 't': 35, 'r': 15},
         # margin={'l': margin,'b': margin,'t': margin,'r': margin},
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
@@ -654,4 +650,4 @@ def distribution_retard(click_valider, click_reset, choix_radio, couleur, time_f
 ############################################################################################
 
 if __name__ == '__main__':
-    app.run_server(debug=True, use_reloader=True)
+    app.run_server(debug=True) #, use_reloader=True)
