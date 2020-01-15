@@ -241,12 +241,24 @@ app.layout = html.Div(
                     ]
                 ),
                 ###### GRAPHIQUES ######
+                # dcc.Tabs(
+                #     id="tabs-with-classes",
+                #     value='gare',
+                #     parent_className='custom-tabs',
+                #     className='custom-tabs-container',
+                #     children=[
+                #         dcc.Tab(
+                #             label='Analyse d\'une gare',
+                #             className='custom-tab',
+                #             value='gare',
+                #             id='gare-tab',
+                #             children=[
                 html.Article(
                     className='graphiques',
                     children=[
                         html.Article(
                             className='leftGraph',
-                            children=[                               
+                            children=[
                                 html.Div(
                                     className='leftUpper',
                                     children=[
@@ -290,7 +302,7 @@ app.layout = html.Div(
                                         dcc.Graph(id='cause-retard'),
                                         dcc.Graph(id='duree-retard'),
                                     ]
-                                ),                
+                                ),
                             ],
                         ),
                         html.Article(
@@ -313,6 +325,19 @@ app.layout = html.Div(
                         )
                     ]
                 )
+                #             ]
+                #         ),
+                #         dcc.Tab(
+                #             className='custom-tab',
+                #             id='trajet-tab',
+                #             value='trajet',
+                #             label='Analyse d\'un trajet',
+                #             children=[
+                #                 html.P('Second tab')
+                #             ]
+                #         )
+                #     ]
+                # ),
             ]
         )
     ]
@@ -434,6 +459,7 @@ def make_cause_retard(df, depart, arrivee):
         paper_bgcolor='rgba(0,0,0,0)',
         title='Origine des retards',
     )
+    print(data)
     return {"data": data, "layout": layout}
 
 
@@ -442,16 +468,16 @@ def make_cause_retard(df, depart, arrivee):
 ##############################
 def make_duree_retard(df, depart, arrivee):
     logger.info('> GRAPHIQUE 2 : Duree Retard')
-    cause_retard = df.pipe(f.get_root_cause)
+    quantite_retard = df.pipe(f.get_quantite_retard)
 
-    causes = list(cause_retard.keys())
-    values = list(cause_retard.values())
+    quantite = list(quantite_retard.keys())
+    values = list(quantite_retard.values())
 
-    colors = ['#1E1E1E', ] * len(causes)
+    colors = ['#1E1E1E', ] * len(quantite)
     max_index = values.index(max(values))
     colors[max_index] = 'crimson'
 
-    data = [go.Bar(x=causes, y=values, marker_color=colors)]
+    data = [go.Bar(x=quantite, y=values, marker_color=colors)]
     layout = go.Layout(
         margin={'l': 25, 'b': 25, 't': 25, 'r': 25},
         plot_bgcolor='rgba(0,0,0,0)',

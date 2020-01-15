@@ -69,7 +69,7 @@ section
     background-color: rgb(222, 222, 222);
     margin: 10px;
     margin-bottom: 20px;
-    
+
     max-width:100%;
     /* overflow: auto; */
 }
@@ -113,17 +113,31 @@ section
 /* ________________________GRAPHIQUES__________________________*/
 /* ____________________________________________________________*/
 
-.graphiques{
+
+.custom-tabs-container{
+
+    /* overflow: auto; */
+
+    background-color: royalblue;
+    width:100%;
+    height:80%;
+
+}
+
+.graphiques {
     overflow: auto;
     display: flex;
-    margin:10px;
+
+    /*margin:10px; due to modf tab */
+
     /* padding:10px; */
     background-color: orange;
     background-color: #1E1E1E;
     
     width:100%;
     /* min-width:90%; */
-    height:80%;
+    height:100%;
+
 }
 
 /* PARTIE GAUCHE
