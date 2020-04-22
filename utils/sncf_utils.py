@@ -96,6 +96,19 @@ def get_root_cause(df):
     return {'extern':extern, 'infra':infra, 'trafic':trafic, 'matos':matos, 'gare':gare, 'voyageurs':voyageurs}
 
 
+# A retravailler par unité (la moyenne n'est pas pondérée dans ce calcul)
+def get_quantite_retard(df):
+    extern = __np.round(df['retard_causes_externes'].mean())
+    infra = __np.round(df['retard_infrastructure_ferroviaire'].mean())
+    trafic = __np.round(df['retard_gestion_trafic'].mean())
+    matos = __np.round(df['retard_materiel_roulant'].mean())
+    gare = __np.round(df['retard_gestion_en_gare_et_reutilisation_de_materiel'].mean())
+    voyageurs = __np.round(df['retard_prise_en_compte_voyageurs'].mean())
+
+    # Tests
+    # root_cause = df_liaison.pipe(get_root_cause)
+    # np.sum(list(root_cause.values()))
+    return {'extern': extern, 'infra': infra, 'trafic': trafic, 'matos': matos, 'gare': gare, 'voyageurs': voyageurs}
 
 
 def transfoCol(ancien, ponctuation=None, accent=None, replacer='_'):

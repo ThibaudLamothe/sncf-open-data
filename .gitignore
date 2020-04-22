@@ -2,8 +2,6 @@ __pycache__
 .DS_Store
 .vscode
 .ipynb_checkpoints
+.idea
 
 *.token
-
-Pipfile
-Pipfile.lock
